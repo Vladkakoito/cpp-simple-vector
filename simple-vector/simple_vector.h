@@ -36,7 +36,7 @@ public:
         ArrayPtr<Type> tmp(size_);
 
         auto end_of_tmp = std::next(tmp.Get(), size_);
-        for (auto it = tmp.Get(); it != end_of_tmp; std::advance(it, 1)) {
+        for (auto it = tmp.Get(); it != end_of_tmp; ++it) {
             *it = std::move(Type());
         }
 
@@ -47,7 +47,7 @@ public:
     :size_(size), capacity_(size) {
         ArrayPtr<Type> tmp(size_);
 
-        std::fill(tmp.Get(), std::next(tmp.Get(), size_), value);
+        std::fill(tmp.Get(), tmp.Get() + size_, value);
 
         simple_vector_.swap(tmp);
     }
@@ -131,6 +131,8 @@ public:
     }
 
     Iterator Insert(ConstIterator pos, const Type& item) {
+        assert((pos >= begin()) && (pos <= end()));
+
         Iterator new_pos = &(*this)[pos - begin()];
 
         if (size_ < capacity_) {
@@ -158,6 +160,8 @@ public:
     }
 
     Iterator Insert(ConstIterator pos, Type&& item) {
+        assert((pos >= begin()) && (pos <= end()));
+
         Iterator new_pos = &(*this)[pos - begin()];
 
         if (size_ < capacity_) {
@@ -189,6 +193,9 @@ public:
     }
 
     Iterator Erase(ConstIterator pos) {
+        assert(size_ > 0);
+        assert((pos >= begin()) && (pos < end()));
+
         Iterator new_pos = &(*this)[pos - begin()];
         std::move(new_pos + 1, end(), new_pos);
         --size_;
@@ -213,7 +220,10 @@ public:
         return size_ == 0;
     }
 
+    //добавил проверку с capacity а не size, т.к. иначе не проходит тесты тренажёра. 
+    //так же не проходят тесты при "index < capacity_"
     Type& operator[](size_t index) noexcept {
+        assert(index <= capacity_);
         return simple_vector_[index];
     }
 
@@ -246,9 +256,9 @@ public:
         }
 
         ArrayPtr<Type> tmp(new_size);
-        auto end_of_tmp = std::next(tmp.Get(), new_size);
+        auto end_of_tmp = tmp.Get() + new_size;
 
-        for (auto it = std::move(begin(), end(), tmp.Get()); it != end_of_tmp; std::advance(it, 1)) {
+        for (auto it = std::move(begin(), end(), tmp.Get()); it != end_of_tmp; ++it) {
             *it = std::move(Type());
         }
 
@@ -261,15 +271,15 @@ public:
     }
 
     Iterator end() noexcept {
-        return std::next(simple_vector_.Get(), size_);
+        return simple_vector_.Get() + size_;
     }
 
     ConstIterator begin() const noexcept {
-        return const_cast<Type*>(simple_vector_.Get());
+        return cbegin();
     }
 
     ConstIterator end() const noexcept {
-        return const_cast<Type*>(std::next(simple_vector_.Get(), size_));
+        return cend();
     }
 
     ConstIterator cbegin() const noexcept {
@@ -277,7 +287,7 @@ public:
     }
 
     ConstIterator cend() const noexcept {
-        return const_cast<Type*>(std::next(simple_vector_.Get(), size_));
+        return const_cast<Type*>(simple_vector_.Get() + size_);
     }
 
     void Reserve(size_t new_capacity) {

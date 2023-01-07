@@ -20,12 +20,20 @@ public:
 
     ArrayPtr(const ArrayPtr&) = delete;
 
+    ArrayPtr(ArrayPtr&& other) {
+        raw_ptr_ = std::exchange(other, nullptr);
+    }
+
     ~ArrayPtr() {
         delete[] raw_ptr_;
         raw_ptr_ = nullptr;
     }
 
     ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    ArrayPtr& operator=(ArrayPtr&& other) {
+        raw_ptr_ = std::exchange(other, nullptr);
+    }
 
     [[nodiscard]] Type* Release() noexcept {
         Type* tmp = raw_ptr_;
