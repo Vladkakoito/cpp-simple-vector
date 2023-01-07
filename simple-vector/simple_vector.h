@@ -35,7 +35,7 @@ public:
     :size_(size), capacity_(size){
         ArrayPtr<Type> tmp(size_);
 
-        auto end_of_tmp = std::next(tmp.Get(), size_);
+        auto end_of_tmp = tmp.Get() + size_;
         for (auto it = tmp.Get(); it != end_of_tmp; ++it) {
             *it = std::move(Type());
         }
