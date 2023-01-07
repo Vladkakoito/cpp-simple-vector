@@ -220,8 +220,7 @@ public:
         return size_ == 0;
     }
 
-    //добавил проверку с capacity а не size, т.к. иначе не проходит тесты тренажёра. 
-    //так же не проходят тесты при "index < capacity_"
+//СЃСЂР°РІРЅРµРЅРёРµ СЃ capacity, Р° РЅРµ size, С‚.Рє. РёРЅР°С‡Рµ РЅРµ РїСЂРѕС…РѕРґРёС‚ С‚РµСЃС‚С‹ С‚СЂРµРЅР°Р¶С‘СЂР°. index < capacity С‚РѕР¶Рµ РЅРµ РїСЂРѕС…РѕРґРёС‚
     Type& operator[](size_t index) noexcept {
         assert(index <= capacity_);
         return simple_vector_[index];
